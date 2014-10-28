@@ -7,27 +7,29 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 import java.util.ArrayList;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-
 import android.speech.RecognizerIntent;
 
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
 
    TextToSpeech ttobj;
-   private EditText write;
+   private Boolean answerIncoming;
+   Boolean questionsRemaining;
+   ArrayList<String> questions = new ArrayList<String>();
+   ArrayList<String> answers = new ArrayList<String>();
+   
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
-      write = (EditText)findViewById(R.id.editText1);
+      answerIncoming = Boolean.FALSE;
+      questionsRemaining = Boolean.TRUE;
+      //write.setVisibility(View.GONE);
       ttobj=new TextToSpeech(getApplicationContext(), 
       new TextToSpeech.OnInitListener() {    
       @Override
@@ -37,27 +39,15 @@ public class MainActivity extends Activity {
             }				
          }
       });
-      txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
-      btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
-
+      collectData();
       // hide the action bar
       getActionBar().hide();
-
-      btnSpeak.setOnClickListener(new View.OnClickListener() {
-
-          @Override
-          public void onClick(View v) {
-              promptSpeechInput();
-          }
-      });
-
    }
    
    @Override
    public void onPause(){
       if(ttobj !=null){
          ttobj.stop();
-         ttobj.shutdown();
       }
       super.onPause();
    }
@@ -68,21 +58,31 @@ public class MainActivity extends Activity {
       return true;
    }
    public void speakText(View view){
-      String toSpeak = write.getText().toString();
-      Toast.makeText(getApplicationContext(), toSpeak, 
-      Toast.LENGTH_SHORT).show();
-      ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
-
+	  for (int i = 0; i<questions.size(); i++){
+		  if (!answerIncoming){
+			  String toSpeak = questions.get(i);
+			  ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+		  }
+	  }
+	  questionsRemaining = Boolean.FALSE;
+   }
+ 
+   private void collectData(){
+	   while (questionsRemaining){      
+		   if (!ttobj.isSpeaking()){
+			// get response
+			   promptSpeechInput();   
+		   }
+	   }
    }
    
-   private TextView txtSpeechInput;
-   private ImageButton btnSpeak;
    private final int REQ_CODE_SPEECH_INPUT = 100;
 
    /**
     * Showing google speech input dialog
     * */
    private void promptSpeechInput() {
+	   answerIncoming = Boolean.TRUE;
        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -111,7 +111,8 @@ public class MainActivity extends Activity {
 
                ArrayList<String> result = data
                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-               txtSpeechInput.setText(result.get(0));
+               answers.add(result.get(0));
+               answerIncoming = Boolean.FALSE;
            }
            break;
        }
