@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import android.content.ActivityNotFoundException;
@@ -20,6 +21,7 @@ public class MainActivity extends Activity {
    TextToSpeech ttobj;
    private Boolean answerIncoming;
    Boolean questionsRemaining;
+   int wordsSpoken;
    ArrayList<String> questions = new ArrayList<String>();
    ArrayList<String> answers = new ArrayList<String>();
    
@@ -39,7 +41,11 @@ public class MainActivity extends Activity {
             }				
          }
       });
-      collectData();
+      wordsSpoken = 0;
+      questions.add("Hello ");
+      questions.add("Who are you ");
+      questions.add("What are you doing here ");
+      //collectData();
       // hide the action bar
       getActionBar().hide();
    }
@@ -57,27 +63,37 @@ public class MainActivity extends Activity {
       getMenuInflater().inflate(R.menu.main, menu);
       return true;
    }
-   public void speakText(View view){
-	  for (int i = 0; i<questions.size(); i++){
-		  if (!answerIncoming){
-			  String toSpeak = questions.get(i);
-			  ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
-		  }
-	  }
-	  questionsRemaining = Boolean.FALSE;
-   }
- 
-   private void collectData(){
-	   while (questionsRemaining){      
-		   if (!ttobj.isSpeaking()){
-			// get response
-			   promptSpeechInput();   
-		   }
-	   }
-   }
    
-   private final int REQ_CODE_SPEECH_INPUT = 100;
+   public void speakText(View view){
+	   String toSpeak;
+	   if (questionsRemaining){
+		  toSpeak = questions.get(wordsSpoken);
+		  if (wordsSpoken == questions.size()){
+			  questionsRemaining = Boolean.FALSE;  
+		  }
+		  else{
+			  wordsSpoken++;  
+		  }
+		  ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+	   }
 
+	   try {
+		    // to sleep 10 seconds
+		    Thread.sleep(2000);
+		} catch (InterruptedException e) {
+		    // recommended because catching InterruptedException clears interrupt flag
+		    Thread.currentThread().interrupt();
+		    // you probably want to quit if the thread is interrupted
+		    return;
+		}
+	   promptSpeechInput();
+
+	  // txtSpeechInput.setText(wordsSpoken);
+   }
+
+   private TextView txtSpeechInput;
+   private final int REQ_CODE_SPEECH_INPUT = 100;
+   
    /**
     * Showing google speech input dialog
     * */
