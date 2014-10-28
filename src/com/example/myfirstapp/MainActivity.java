@@ -19,7 +19,6 @@ import android.speech.RecognizerIntent;
 public class MainActivity extends Activity {
 
    TextToSpeech ttobj;
-   private Boolean answerIncoming;
    Boolean questionsRemaining;
    int wordsSpoken;
    ArrayList<String> questions = new ArrayList<String>();
@@ -29,8 +28,8 @@ public class MainActivity extends Activity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
-      answerIncoming = Boolean.FALSE;
       questionsRemaining = Boolean.TRUE;
+      txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
       //write.setVisibility(View.GONE);
       ttobj=new TextToSpeech(getApplicationContext(), 
       new TextToSpeech.OnInitListener() {    
@@ -42,6 +41,9 @@ public class MainActivity extends Activity {
          }
       });
       wordsSpoken = 0;
+      answers.add("null");
+      answers.add("null");
+      answers.add("null");
       questions.add("Hello ");
       questions.add("Who are you ");
       questions.add("What are you doing here ");
@@ -87,10 +89,28 @@ public class MainActivity extends Activity {
 		    return;
 		}
 	   promptSpeechInput();
-
-	  // txtSpeechInput.setText(wordsSpoken);
+	   try {
+		    // to sleep 10 seconds
+		    Thread.sleep(2000);
+		} catch (InterruptedException e) {
+		    // recommended because catching InterruptedException clears interrupt flag
+		    Thread.currentThread().interrupt();
+		    // you probably want to quit if the thread is interrupted
+		    return;
+		}
+	      displayResults();
+	   
    }
 
+   private void displayResults(){
+	   String buildAnswer = "";
+		  for(int i = 0; i< answers.size(); i++){
+			  buildAnswer.concat(answers.get(i));
+			  buildAnswer.concat(", ");
+		  }
+	   txtSpeechInput.setText(buildAnswer);
+   }
+   
    private TextView txtSpeechInput;
    private final int REQ_CODE_SPEECH_INPUT = 100;
    
@@ -98,7 +118,6 @@ public class MainActivity extends Activity {
     * Showing google speech input dialog
     * */
    private void promptSpeechInput() {
-	   answerIncoming = Boolean.TRUE;
        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -127,8 +146,8 @@ public class MainActivity extends Activity {
 
                ArrayList<String> result = data
                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-               answers.add(result.get(0));
-               answerIncoming = Boolean.FALSE;
+               answers.add(wordsSpoken-1,result.get(0));
+               txtSpeechInput.setText(result.get(0));
            }
            break;
        }
