@@ -26,6 +26,7 @@ public class MainActivity extends Activity {
    Boolean questionsRemaining;
    int currentState;
    int timeDelay;
+   DBHelper mydb;
    Map<String,String> questions = new HashMap<String,String>();
    Map<String,String> answers = new HashMap<String,String>();
    
@@ -33,6 +34,9 @@ public class MainActivity extends Activity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
+      
+      mydb = new DBHelper(this);
+      
       questionsRemaining = Boolean.TRUE;
       txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
       //write.setVisibility(View.GONE);
@@ -62,6 +66,8 @@ public class MainActivity extends Activity {
       questions.put("byeGood", "Great! Thank you for visiting "+residentName+"’s residence. He will get in touch with you at his earliest convenience. Have a good day!");
       questions.put("byeBad", "Thank you for visiting "+residentName+"’s residence. I'm sorry I could not be of more assistance. Have a good day!");
 
+      mydb.insertUser(answers);
+      
       // hide the action bar
       getActionBar().hide();
    }
