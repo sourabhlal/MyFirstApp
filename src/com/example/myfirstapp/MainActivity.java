@@ -167,14 +167,13 @@ public class MainActivity extends Activity {
    }
    
    public void updateCurrentState(String userResponse){
-	   Log.d(((Integer) currentState).toString(),"called");
 	   switch (currentState){
 	   	case 1:
 	   		if (userResponse.equalsIgnoreCase("yes") || userResponse.equalsIgnoreCase("yes please") || userResponse.equalsIgnoreCase("sure")){
 	   			currentState = 21;
 	   		}
 	   		else{
-	   			currentState = 9;
+	   			currentState = 92;
 	   		}
 	   		break;
 	   	case 21:
