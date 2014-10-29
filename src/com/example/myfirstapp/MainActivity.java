@@ -65,8 +65,6 @@ public class MainActivity extends Activity {
       questions.put("sorry", "Sorry, Your information has not been recorded. Do you want to try again.");
       questions.put("byeGood", "Great! Thank you for visiting "+residentName+"’s residence. He will get in touch with you at his earliest convenience. Have a good day!");
       questions.put("byeBad", "Thank you for visiting "+residentName+"’s residence. I'm sorry I could not be of more assistance. Have a good day!");
-
-      mydb.insertUser(answers);
       
       // hide the action bar
       getActionBar().hide();
@@ -169,6 +167,7 @@ public class MainActivity extends Activity {
    }
    
    public void updateCurrentState(String userResponse){
+	   Log.d(((Integer) currentState).toString(),"called");
 	   switch (currentState){
 	   	case 1:
 	   		if (userResponse.equalsIgnoreCase("yes") || userResponse.equalsIgnoreCase("yes please") || userResponse.equalsIgnoreCase("sure")){
@@ -276,6 +275,7 @@ public class MainActivity extends Activity {
 	   }
 	   else{
 		   displayResults();
+		   mydb.insertUser(answers);
 		   updateCurrentState("");
 	   }
    }

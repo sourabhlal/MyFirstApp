@@ -1,8 +1,6 @@
 package com.example.myfirstapp;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import android.content.ContentValues;
@@ -24,7 +22,6 @@ public class DBHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "VISITOR";
 	private static final String DATABASE_TABLE = "userInfo";
 
-	private HashMap hp;
 
 	   public DBHelper(Context context)
 	   {
@@ -103,9 +100,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	      new String[] { Integer.toString(id) });
 	   }
 	   
-	   public ArrayList getAllContacts()
+	   public ArrayList<String> getAllContacts()
 	   {
-	      ArrayList array_list = new ArrayList();
+	      ArrayList<String> array_list = new ArrayList<String>();
 	      //hp = new HashMap();
 	      SQLiteDatabase db = this.getReadableDatabase();
 	      Cursor res =  db.rawQuery( "select * from userInfo", null );
