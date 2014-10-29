@@ -39,7 +39,6 @@ public class MainActivity extends Activity {
       
       questionsRemaining = Boolean.TRUE;
       txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
-      //write.setVisibility(View.GONE);
       ttobj=new TextToSpeech(getApplicationContext(), 
       new TextToSpeech.OnInitListener() {    
       @Override
@@ -56,8 +55,8 @@ public class MainActivity extends Activity {
       questions.put("intro", "Hi! "+residentName+" is not home at the moment. Would you like for me to inform him that you were here?");
       questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Please wait for the beep before you reply. Please keep your responses as brief as possible. Say “OK” for me to continue.");
       questions.put("name", "What is your name?");
-      questions.put("urgent", "Is your visit urgent? Or can it wait till  "+residentName+" arrives back home? Please reply with a yes or a no");
-      questions.put("purpose", "What is the purpose of your visit?");
+      questions.put("urgent", "Is your visit urgent? Or can it wait till  "+residentName+" arrives back home?");
+      questions.put("purpose", "So XYZ123, What is the purpose of your visit?");
       questions.put("contactType", "How would you prefer  "+residentName+" to contact you? By email or by phone?");
       questions.put("phoneNumber", "What is your mobile phone number?");
       questions.put("emailAddress", "What is your email address. Please spell it out.");
@@ -90,13 +89,13 @@ public class MainActivity extends Activity {
 	   		timeDelay = 5000;
 	   		break;
 	   	case 21:
-	   		timeDelay = 15000;
+	   		timeDelay = 12000;
 	   		break;
 	   	case 22:
-	   		timeDelay = 15000;
+	   		timeDelay = 12000;
 	   		break;
 	   	case 23:
-	   		timeDelay = 15000;
+	   		timeDelay = 12000;
 	   		break;
 	   	case 3:
 	   		timeDelay = 2000;
@@ -117,7 +116,7 @@ public class MainActivity extends Activity {
 	   		timeDelay = 3000;
 	   		break;
 	   	case 81:
-	   		timeDelay = 10000;
+	   		timeDelay = 7000;
 	   		break;
 	   	case 82:
 	   		timeDelay = 5000;
@@ -145,9 +144,9 @@ public class MainActivity extends Activity {
 	   	case 3:
 	   		return "name";
 	   	case 4:
-	   		return "urgent";
-	   	case 5:
 	   		return "purpose";
+	   	case 5:
+	   		return "urgent";
 	   	case 6:
 	   		return "contactType";
 	   	case 71:
@@ -167,6 +166,8 @@ public class MainActivity extends Activity {
    }
    
    public void updateCurrentState(String userResponse){
+	   String str1 = "";
+	   String str2 = "";
 	   switch (currentState){
 	   	case 1:
 	   		if (userResponse.equalsIgnoreCase("yes") || userResponse.equalsIgnoreCase("yes please") || userResponse.equalsIgnoreCase("sure")){
@@ -201,6 +202,9 @@ public class MainActivity extends Activity {
 	   		}
 	   		break;
 	   	case 3:
+	   		str1 = questions.get("purpose");
+	   		str2 = str1.replaceFirst("XYZ123", userResponse);
+	   		questions.put("purpose", str2);
 	   		currentState = 4;
 	   		break;
 	   	case 4:
@@ -220,15 +224,15 @@ public class MainActivity extends Activity {
 	   		}
 	   		break;
 	   	case 71:
-	   		String str1 = questions.get("verifyConact");
-	   		String str2 = str1.replaceFirst("XYZ123", userResponse);
+	   		str1 = questions.get("verifyConact");
+	   		str2 = str1.replaceFirst("XYZ123", userResponse);
 	   		questions.put("verifyConact", str2);
 	   		currentState = 81;
 	   		break;
 	   	case 72:
-	   		String str3 = questions.get("verifyConact");
-	   		String str4 = str3.replaceFirst("XYZ123", userResponse);
-	   		questions.put("verifyConact", str4);
+	   		str1 = questions.get("verifyConact");
+	   		str2 = str1.replaceFirst("XYZ123", userResponse);
+	   		questions.put("verifyConact", str2);
 	   		currentState = 81;
 	   		break;
 	   	case 81:
@@ -254,6 +258,8 @@ public class MainActivity extends Activity {
 	   		currentState = 1;
 	   		break;
 	   }
+	   str1 = "";
+	   str2 = "";
    }
    
    public void speakText(View view){
@@ -274,7 +280,9 @@ public class MainActivity extends Activity {
 	   }
 	   else{
 		   displayResults();
-		   mydb.insertUser(answers);
+		   if (answers.get("intro").equalsIgnoreCase("yes") || answers.get("intro").equalsIgnoreCase("yes please") || answers.get("intro").equalsIgnoreCase("sure")){
+			   mydb.insertUser(answers);   
+		   }
 		   updateCurrentState("");
 	   }
    }
