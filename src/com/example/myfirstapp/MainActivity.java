@@ -5,6 +5,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -41,13 +42,9 @@ public class MainActivity extends Activity {
          }
       });
       wordsSpoken = 0;
-      answers.add("null");
-      answers.add("null");
-      answers.add("null");
-      questions.add("Hello ");
+      questions.add("Hi. You are at sawrub's residence ");
       questions.add("Who are you ");
       questions.add("What are you doing here ");
-      //collectData();
       // hide the action bar
       getActionBar().hide();
    }
@@ -70,14 +67,14 @@ public class MainActivity extends Activity {
 	   String toSpeak;
 	   if (questionsRemaining){
 		  toSpeak = questions.get(wordsSpoken);
-		  if (wordsSpoken == questions.size()){
+		  if (wordsSpoken == questions.size()-1){
 			  questionsRemaining = Boolean.FALSE;  
 		  }
 		  else{
 			  wordsSpoken++;  
 		  }
 		  ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
-	   }
+
 
 	   try {
 		    // to sleep 10 seconds
@@ -98,17 +95,17 @@ public class MainActivity extends Activity {
 		    // you probably want to quit if the thread is interrupted
 		    return;
 		}
-	      displayResults();
+	   }
+	   else{
+		   displayResults();
+	   }
 	   
    }
 
    private void displayResults(){
-	   String buildAnswer = "";
-		  for(int i = 0; i< answers.size(); i++){
-			  buildAnswer.concat(answers.get(i));
-			  buildAnswer.concat(", ");
-		  }
-	   txtSpeechInput.setText(buildAnswer);
+	  for(int i = 0; i< answers.size(); i++){
+		  Log.d("result",answers.get(i));
+	  }
    }
    
    private TextView txtSpeechInput;
@@ -147,6 +144,7 @@ public class MainActivity extends Activity {
                ArrayList<String> result = data
                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                answers.add(wordsSpoken-1,result.get(0));
+               Log.d("WORKING",answers.get(wordsSpoken-1));
                txtSpeechInput.setText(result.get(0));
            }
            break;
