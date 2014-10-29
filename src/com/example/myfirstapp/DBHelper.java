@@ -54,17 +54,17 @@ public class DBHelper extends SQLiteOpenHelper {
 	      contentValues.put("urgent", map.get("urgent"));
 	      contentValues.put("purpose", map.get("purpose"));
 	      contentValues.put("contact_type", map.get("contactType"));
-	      if(map.get("contactType") == "mail") {
+	      if(map.get("contactType").toLowerCase().contains("mail")) {
 	    	  contentValues.put("contact", map.get("emailAddress"));
 	      }
 	      else {
 	    	  StringBuilder temp = new StringBuilder();
-	    	  for(int i = 0; i < map.get("phone").length(); i++)
+	    	  for(int i = 0; i < map.get("phoneNumber").length(); i++)
 	    	  {
 	    		  if (i > 0)
 	    			  temp.append(" ");
 	    		  
-	    		  temp.append(map.get("phone").charAt(i));
+	    		  temp.append(map.get("phoneNumber").charAt(i));
 	    	  }
 	    	  contentValues.put("contact", temp.toString());
 	      }
