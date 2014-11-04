@@ -94,6 +94,8 @@ public class MainActivity extends Activity {
 	   if(oi.getCurrentState()<90){
 		   if (oi.getCurrentState()==24){
 			   dispatchTakePictureIntent();
+			   oi.updateCurrentState("");
+               oi.setTimeDelay();
 		   }
 		   else{
 			   promptSpeechInput();

@@ -14,15 +14,14 @@ public class Outside_Interactions {
    public Outside_Interactions(String owner){
 	   this.residentName = owner;
 	   this.currentState = 1;
-	   this.category = 0;
+	   this.category = -1;
 	   this.setTimeDelay();
-	   this.setQuestions();
+	   questions.put("intro", "Hi! "+owner+" is not home at the moment. Would you like for me to inform him that you were here?");
+	   questions.put("picture", "Ok. Please look into the camera, and smile");
+	   questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Please wait for the beep before you reply. Please keep your responses as brief as possible. Okay?");
    }
 
    public void setQuestions(){
-      questions.put("intro", "Hi! "+residentName+" is not home at the moment. Would you like for me to inform him that you were here?");
-      questions.put("picture", "Ok. Please look into the camera, and smile");
-      questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Please wait for the beep before you reply. Please keep your responses as brief as possible. Okay?");
 	   if (category == 0){
 	      questions.put("name", "What is your name?");
 	      questions.put("urgent", "Is your visit urgent? Or can it wait till  "+residentName+" arrives back home?");
@@ -44,6 +43,14 @@ public class Outside_Interactions {
    }
    
    public String getStateText(int state){
+	   if (category == -1){
+		   switch (state){
+		   	case 1:
+		   		return "intro";
+		   	case 24:
+		   		return "picture";
+		   }
+	   }
 	   if (category == 0){
 		   switch (state){
 		   	case 1:
@@ -95,16 +102,26 @@ public class Outside_Interactions {
    public void updateCurrentState(String userResponse){
 	   String str1 = "";
 	   String str2 = "";
-	   if (category == 0){
+	   if (category == -1){   
 		   switch (currentState){
 		   	case 1:
 		   		if (userResponse.equalsIgnoreCase("yes") || userResponse.equalsIgnoreCase("yes please") || userResponse.equalsIgnoreCase("sure")){
-		   			currentState = 21;
+		   			currentState = 24;
 		   		}
 		   		else{
 		   			currentState = 92;
 		   		}
 		   		break;
+		   	case 24:
+		   		//run facial recognition - return category
+		   		//set category
+		   		category = 0;
+		   		currentState = 21;
+		   		break;
+		   }
+	   }
+	   else if (category == 0){
+		   switch (currentState){
 		   	case 21:
 		   		if (userResponse.equalsIgnoreCase("ok") || userResponse.equalsIgnoreCase("okay")){
 		   			currentState = 3;
@@ -218,6 +235,16 @@ public class Outside_Interactions {
 		this.currentState = currentState;
 	}
 	public void setTimeDelay(){
+	   if (category == -1){
+			switch (currentState){
+		   	case 1:
+		   		timeDelay = 5000;
+		   		break;
+		   	case 24:
+		   		timeDelay = 5000;
+		   		break;
+			}
+		}
 	   if (category == 0){
 		   switch (currentState){
 		   	case 1:
