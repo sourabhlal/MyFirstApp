@@ -159,11 +159,11 @@ public class Outside_Interactions {
 		   		currentState = 6;
 		   		break;
 		   	case 6:	   		
-		   		if (userResponse.toLowerCase().contains("phone")||userResponse.toLowerCase().contains("fone")){
+		   		if (userResponse.toLowerCase().contains("phone")||userResponse.toLowerCase().contains("fone")||userResponse.toLowerCase().contains("call")){
 		   			questions.put("verifyConact", "Your phone number is XYZ123. Is that correct?");
 		   			currentState = 71;
 		   		}
-		   		else if (userResponse.toLowerCase().contains("mail")||userResponse.toLowerCase().contains("fone")){
+		   		else if (userResponse.toLowerCase().contains("mail")||userResponse.toLowerCase().contains("write")){
 		   			questions.put("verifyConact", "Your email address is XYZ123. Is that correct?");
 		   			currentState = 72;
 		   		}
