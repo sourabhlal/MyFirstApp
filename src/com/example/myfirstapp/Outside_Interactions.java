@@ -3,6 +3,8 @@ package com.example.myfirstapp;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.util.Log;
+
 public class Outside_Interactions {
 
    int currentState;
@@ -18,7 +20,9 @@ public class Outside_Interactions {
 	   this.setTimeDelay();
 	   questions.put("intro", "Hi! "+owner+" is not home at the moment. Would you like for me to inform him that you were here?");
 	   questions.put("picture", "Ok. Please look into the camera, and smile");
-	   questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Please wait for the beep before you reply. Please keep your responses as brief as possible. Okay?");
+	   //questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Please wait for the beep before you reply. Please keep your responses as brief as possible. Okay?");
+	   questions.put("instruction", "ok?");
+
    }
 
    public void setQuestions(){
@@ -29,7 +33,7 @@ public class Outside_Interactions {
 	      questions.put("contactType", "How would you prefer  "+residentName+" to contact you? By email or by phone?");
 	      questions.put("phoneNumber", "What is your mobile phone number?");
 	      questions.put("emailAddress", "What is your email address. Please spell it out.");
-	      questions.put("verifyConact", "Your bla is bla bla bla. Is that correct?");
+	      questions.put("verifyContact", "Your bla is bla bla bla. Is that correct?");
 	      questions.put("sorry", "Sorry, Your information has not been recorded. Do you want to try again.");
 	      questions.put("byeGood", "Great! Thank you for visiting "+residentName+"’s residence. He will get in touch with you at his earliest convenience. Have a good day!");
 	      questions.put("byeBad", "Thank you for visiting "+residentName+"’s residence. I'm sorry I could not be of more assistance. Have a good day!");
@@ -40,6 +44,10 @@ public class Outside_Interactions {
 	   if (category==2){
 
 	   }
+   }
+   
+   public String getQuestion() {
+	   return this.questions.get(getStateText(this.currentState));
    }
    
    public String getStateText(int state){
@@ -76,7 +84,7 @@ public class Outside_Interactions {
 		   	case 72:
 		   		return "emailAddress";
 		   	case 81:
-		   		return "verifyConact";
+		   		return "verifyContact";
 		   	case 82:
 		   		return "sorry";
 		   	case 91:
@@ -117,6 +125,7 @@ public class Outside_Interactions {
 		   		//set category
 		   		category = 0;
 		   		currentState = 21;
+		   		setQuestions();
 		   		break;
 		   }
 	   }
@@ -160,24 +169,24 @@ public class Outside_Interactions {
 		   		break;
 		   	case 6:	   		
 		   		if (userResponse.toLowerCase().contains("phone")||userResponse.toLowerCase().contains("fone")||userResponse.toLowerCase().contains("call")){
-		   			questions.put("verifyConact", "Your phone number is XYZ123. Is that correct?");
+		   			questions.put("verifyContact", "Your phone number is XYZ123. Is that correct?");
 		   			currentState = 71;
 		   		}
 		   		else if (userResponse.toLowerCase().contains("mail")||userResponse.toLowerCase().contains("write")){
-		   			questions.put("verifyConact", "Your email address is XYZ123. Is that correct?");
+		   			questions.put("verifyContact", "Your email address is XYZ123. Is that correct?");
 		   			currentState = 72;
 		   		}
 		   		break;
 		   	case 71:
-		   		str1 = questions.get("verifyConact");
+		   		str1 = questions.get("verifyContact");
 		   		str2 = str1.replaceFirst("XYZ123", userResponse);
-		   		questions.put("verifyConact", str2);
+		   		questions.put("verifyContact", str2);
 		   		currentState = 81;
 		   		break;
 		   	case 72:
-		   		str1 = questions.get("verifyConact");
+		   		str1 = questions.get("verifyContact");
 		   		str2 = str1.replaceFirst("XYZ123", userResponse);
-		   		questions.put("verifyConact", str2);
+		   		questions.put("verifyContact", str2);
 		   		currentState = 81;
 		   		break;
 		   	case 81:
@@ -251,7 +260,7 @@ public class Outside_Interactions {
 		   		timeDelay = 5000;
 		   		break;
 		   	case 21:
-		   		timeDelay = 12000;
+		   		timeDelay = 1000;//12000;
 		   		break;
 		   	case 22:
 		   		timeDelay = 12000;
