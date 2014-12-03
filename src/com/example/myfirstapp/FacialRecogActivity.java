@@ -30,10 +30,11 @@ public class FacialRecogActivity extends ActionBarActivity implements Camera.Pre
 	private OrientationEventListener orientationListener; // Accessing device
 	
 	private int FRONT_CAMERA_INDEX = 1;
+	private int BACK_CAMERA_INDEX = 0;
 	private int lastAngle = 0;
 	private int personId;
 	private static int displayAngle;
-	private static boolean cameraFacingFront = true;
+	private static boolean cameraFacingFront = false;
 	private static boolean activityStartedOnce = false;
 	private boolean identifyPerson = true;
 	private final String PROJECTION_PATH = MediaStore.Images.Media.DATA;
@@ -128,7 +129,7 @@ private void stopCamera() {
 	 */
 	private void startCamera() {
 		
-		cameraObj = Camera.open(FRONT_CAMERA_INDEX); // Open the Front
+		cameraObj = Camera.open(BACK_CAMERA_INDEX); // Open the Front
 
 		mPreview = new CameraSurfacePreview(FacialRecogActivity.this, cameraObj,
 				orientationListener); // Create a new surface on which Camera

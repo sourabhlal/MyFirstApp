@@ -19,8 +19,8 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static final String KEY_CONTACTTYPE = "contact_type";
 	public static final String KEY_CONTACT = "contact";
 	
-	private static final String DATABASE_NAME = "VISITOR";
-	private static final String DATABASE_TABLE = "userInfo";
+	public static final String DATABASE_NAME = "VISITOR";
+	public static final String DATABASE_TABLE = "userInfo";
 
 
 	   public DBHelper(Context context)
@@ -72,9 +72,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	      db.insert("userInfo", null, contentValues);
 	      return true;
 	   }
-	   public Cursor getData(int id){
+	   public Cursor getData(String name){
 	      SQLiteDatabase db = this.getReadableDatabase();
-	      Cursor res =  db.rawQuery( "select * from userInfo where _id=" + id + "", null );
+	      Cursor res =  db.rawQuery( "select * from userInfo where name='" + name + "'", null );
 	      return res;
 	   }
 	   public int numberOfRows(){

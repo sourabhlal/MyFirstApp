@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -21,7 +22,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,29 +71,6 @@ public class MainActivity extends Activity {
       Bundle extras = getIntent().getExtras();
       oi = new Outside_Interactions("John");
       
-      if(extras != null){
-    	  identifiedPerson = extras.getBoolean("ID_Successful");
-          person_id = extras.getString("ID_Person");
-          hashPosition = extras.getInt("hashPos");
-          
-          Log.d("id person", person_id);
-          
-          if(identifiedPerson) {
-        	  //oi.setCategory(1);
-        	  Log.d("id success", "true");
-        	  oi.setCategory(1);
-        	  //oi.setCurrentState(21);
-        	  oi.setQuestions();
-        	  
-          }
-          else {
-        	  Log.d("id success", "false");
-        	  oi.setCurrentState(21);
-        	  oi.setCategory(0);
-        	  oi.setQuestions();
-          }
-      }
-      
       mydb = new DBHelper(this);
       
       questionsRemaining = Boolean.TRUE;
@@ -140,6 +117,30 @@ public class MainActivity extends Activity {
       }
       
       displayResults();
+      
+      if(extras != null){
+    	  identifiedPerson = extras.getBoolean("ID_Successful");
+          person_id = extras.getString("ID_Person");
+          hashPosition = extras.getInt("hashPos");
+          
+          Log.d("id person", person_id);
+          
+          if(identifiedPerson) {
+        	  Log.d("id success", "true");
+        	  oi.setCategory(1);
+        	  oi.setCurrentState(3);
+        	  oi.setVisitorName(person_id);
+        	  oi.setQuestions();
+          }
+          else {
+        	  Log.d("id success", "false");
+        	  oi.setCurrentState(21);
+        	  oi.setCategory(0);
+        	  oi.setVisitorName("Unidentified_Person");
+        	  oi.setQuestions();
+          }
+
+      }
             
       // hide the action bar
       getActionBar().hide();
@@ -174,7 +175,7 @@ public class MainActivity extends Activity {
 	   String currentStateKey = oi.getStateText(oi.getCurrentState());
 	   Log.d("current state", Integer.toString(oi.getCurrentState()));
 	   Log.d("state key", currentStateKey);
-	   //oi.setCurrentState(24);
+
 	   toSpeak = oi.getQuestion();
 	   
 	   Log.d(((Integer) oi.getCurrentState()).toString(),toSpeak);
@@ -199,10 +200,12 @@ public class MainActivity extends Activity {
 	   }
 	   else{
 		   if (answers.get("intro").equalsIgnoreCase("yes") || answers.get("intro").equalsIgnoreCase("yes please") || answers.get("intro").equalsIgnoreCase("sure")){
-			   mydb.insertUser(answers);
+			   if(!identifiedPerson){
+				   mydb.insertUser(answers);
+			   }		   
 		   }
 		   
-		   new SendMail().execute(answers);
+		  new SendMail().execute(answers);
 	    	  
 		   displayResults();
 		   oi.updateCurrentState("");
@@ -252,12 +255,20 @@ public class MainActivity extends Activity {
 	   }
 	   else{
 		   if (answers.get("intro").equalsIgnoreCase("yes") || answers.get("intro").equalsIgnoreCase("yes please") || answers.get("intro").equalsIgnoreCase("sure")){
-			   mydb.insertUser(answers);
+			   displayAnswers();
+			   if(!identifiedPerson) {
+				   mydb.insertUser(answers);
+			   }
 		   }
+		   Map<String, String> answersIn = new HashMap<String, String>();
 		   
-		   new SendMail().execute(answers);
+		   for(Entry<String, String> e: answers.entrySet()) {
+				answersIn.put(e.getKey(), e.getValue());
+			}
+		   
+		   new SendMail().execute(answersIn);
 	    	  
-		   displayResults();
+		   //displayResults();
 		   oi.updateCurrentState("");
 		   answers.clear();
 	   }
@@ -307,7 +318,14 @@ public class MainActivity extends Activity {
 	               {
 	            	   answers.put(oi.getStateText(oi.getCurrentState()),"email");
 	               }
-	               answers.put(oi.getStateText(oi.getCurrentState()),result.get(0));
+	               else if(oi.getStateText(oi.getCurrentState()).equalsIgnoreCase("confirmIdentity") 
+	            		   && result.get(0).toLowerCase().contains("ye")) {
+	            	   answers.put("name", person_id);
+	            	   getContact(person_id);
+	               }
+	               else {
+	            	   answers.put(oi.getStateText(oi.getCurrentState()),result.get(0));
+	               }
 	               if(oi.getCurrentState() == 3) {
 	            	   answers.put("intro", "yes");
 	            	   Log.d("answer", result.get(0));
@@ -325,6 +343,22 @@ public class MainActivity extends Activity {
 	       }
 
        }
+   }
+   
+   public void getContact(String name) {
+	   Cursor cur = mydb.getData(name);
+	   cur.moveToNext();
+	   String contType = cur.getString(cur.getColumnIndex(DBHelper.KEY_CONTACTTYPE));
+	   String cont = cur.getString(cur.getColumnIndex(DBHelper.KEY_CONTACT));
+	   answers.put("contactType", contType);
+	   answers.put("contact", cont);  
+	   cur.close();
+   }
+   
+   public void displayAnswers() {
+	   for(Entry<String, String> e : answers.entrySet()) {
+	        Log.d(e.getKey(),e.getValue());
+	    }
    }
    
    public void resetAlbum(View view) {
@@ -354,6 +388,8 @@ public class MainActivity extends Activity {
 								}
 							}
 						}).show();
+		this.deleteDatabase(mydb.DATABASE_NAME);
+		mydb = new DBHelper(this);
 	}
    
    public void loadAlbum() {
@@ -409,18 +445,34 @@ public class MainActivity extends Activity {
 	
 	private class SendMail extends AsyncTask <Map<String,String>, Void, Void> {
 
+		
 		@Override
 		protected Void doInBackground(Map<String, String>... params) {
 			Map<String, String> answersIn = new HashMap<String, String>(params[0]);
+			
 			Mail m = new Mail("remindoor@gmail.com", "remindoor291"); 
 			String[] toArr = {"freppy1213@hotmail.com", "remindoor@gmail.com"}; 
 			String contactInfo;
-			if(answersIn.get("contactType").equalsIgnoreCase("email")){
-				contactInfo = answersIn.get("emailAddress");
+			
+			for(Entry<String, String> e: params[0].entrySet()) {
+				answersIn.put(e.getKey(), e.getValue());
+			}
+			
+			
+			if(identifiedPerson) {
+				contactInfo = answersIn.get("contact");
 			}
 			else {
-				contactInfo = answersIn.get("phoneNumber");
+				if(answersIn.get("contactType").equalsIgnoreCase("email")){
+					Log.d("in email", "reached");
+					contactInfo = answersIn.get("emailAddress");
+				}
+				else {
+					Log.d("in phone", "reached");
+					contactInfo = answersIn.get("phoneNumber");
+				}
 			}
+			
 		    m.setTo(toArr); 
 		    m.setFrom("remindoor@gmail.com"); 
 		    m.setSubject(answersIn.get("name") + " visited!!"); 

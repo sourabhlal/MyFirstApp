@@ -294,9 +294,11 @@ public class ImageConfirmation extends ActionBarActivity {
 								// index
 								arrayPosition = i;
 							}
-							hashPos = faceObj.addPerson(arrayPosition);
-							saveAlbum();
-							Log.d("Success save album", "reached");
+							if(!success) {
+								hashPos = faceObj.addPerson(arrayPosition);
+								saveAlbum();
+								Log.d("Success save album", "reached");
+							}
 						}
 						confirmButton.setVisibility(View.GONE);
 						// Setting the view with the bitmap image that came in

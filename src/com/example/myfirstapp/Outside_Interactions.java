@@ -2,6 +2,7 @@ package com.example.myfirstapp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import android.util.Log;
 
@@ -12,6 +13,10 @@ public class Outside_Interactions {
    int category;
    String residentName;
    Map<String,String> questions = new HashMap<String,String>();
+   String visitorName;
+   String[] funFacts = new String[9];
+   int factNum;
+   boolean wantToTalk = true;
 
    public Outside_Interactions(String owner){
 	   this.residentName = owner;
@@ -20,9 +25,17 @@ public class Outside_Interactions {
 	   this.setTimeDelay();
 	   questions.put("intro", "Hi! "+owner+" is not home at the moment. Would you like for me to inform him that you were here?");
 	   questions.put("picture", "Ok. Please look into the camera, and smile");
-	   //questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Please wait for the beep before you reply. Please keep your responses as brief as possible. Okay?");
-	   questions.put("instruction", "ok?");
+	   questions.put("instruction", "I will ask you a couple of questions so that I can note down a reminder for  "+residentName+". Okay?");
 
+	   funFacts[0] = "Did you know that a donkey will sink in quicksand but a mule won’t.";
+	   funFacts[1] = "Did you know that A rhinoceros horn is made of compacted hair.";
+	   funFacts[2] = "Did you know that It’s illegal to spit on the sidewalk in Norfolk, Virginia.";
+	   funFacts[3] = "Did you know that India has a Bill of Rights for cows.";
+	   funFacts[4] = "Did you know that A giraffe can clean its ears with its 21-inch tongue!";
+	   funFacts[5] = "Did you know that It was discovered on a space mission that a frog can throw up.";
+	   funFacts[6] = "Did you know that Certain frogs can be frozen solid then thawed, and continue living.";
+	   funFacts[7] = "Did you know that A duck’s quack doesn’t echo, and no one knows why.";
+	   funFacts[8] = "Did you know that If you feed a seagull Alka-Seltzer, its stomach will explode.";
    }
 
    public void setQuestions(){
@@ -36,9 +49,18 @@ public class Outside_Interactions {
 	      questions.put("verifyContact", "Your bla is bla bla bla. Is that correct?");
 	      questions.put("sorry", "Sorry, Your information has not been recorded. Do you want to try again.");
 	      questions.put("byeGood", "Great! Thank you for visiting "+residentName+"ís residence. He will get in touch with you at his earliest convenience. Have a good day!");
-	      questions.put("byeBad", "Thank you for visiting "+residentName+"ís residence. I'm sorry I could not be of more assistance. Have a good day!");
+	      questions.put("byeBad", "Thank you for visiting "+residentName+"'s residence. I'm sorry I could not be of more assistance. Have a good day!");
 	   }
 	   if (category==1){
+		   Log.d("cat 1", "reached");
+		   Random rand = new Random();
+		   factNum = rand.nextInt(funFacts.length);
+		   questions.put("confirmIdentity", "are you " + visitorName + "?");
+		   questions.put("urgent", "Hey " + visitorName.split(" ")[0] + " are you in a hurry?");
+		   questions.put("purpose", "So what are you here for?");
+		   questions.put("byeGood", "Ok I just notified " + residentName + ". Great seeing you again! Have a nice day.");
+		   questions.put("byeBad", "I got the message, now get out you unsocialble twit");
+		   questions.put("funFact", funFacts[factNum]);
 
 	   }
 	   if (category==2){
@@ -96,7 +118,20 @@ public class Outside_Interactions {
 	   }
 	   else if (category==1){
 		   switch (state){
-		   
+		   case 3:
+			   return "confirmIdentity";
+		   case 4:
+			   return "urgent";
+		   case 5:
+			   return "purpose";
+		   case 90:
+			   if(wantToTalk)
+				   return "byeGood";
+			   else
+				   return "byeBad";
+		   case 7:
+			   return "funFact";
+		   		
 		   }
 	   }
 	   else if (category==2){
@@ -121,8 +156,6 @@ public class Outside_Interactions {
 		   		}
 		   		break;
 		   	case 24:
-		   		//run facial recognition - return category
-		   		//set category
 		   		category = 0;
 		   		currentState = 21;
 		   		setQuestions();
@@ -215,7 +248,34 @@ public class Outside_Interactions {
 	   }
 	   if (category==1){
 		   switch (currentState){
-		   
+		   	case 3:
+		   		if (userResponse.toLowerCase().contains("ye") || userResponse.equalsIgnoreCase("sure") || userResponse.equalsIgnoreCase("ok")){
+		   			currentState = 4;
+		   		}
+		   		else {
+		   			category = 0;
+		   			currentState = 21;
+		   			setQuestions();
+		   		}
+		   		break;
+		   	case 4:
+		   		if (userResponse.toLowerCase().contains("ye") || userResponse.equalsIgnoreCase("sure") || userResponse.equalsIgnoreCase("ok")) {
+		   			currentState = 5;
+		   			wantToTalk = false;
+		   		}
+		   		else {
+		   			currentState = 7;
+		   		}
+		   		break;
+		   	case 5:
+		   		currentState = 90;
+		   		break;
+		   	case 90:
+		   		currentState = 1;
+		   		break;
+		   	case 7:
+		   		currentState = 5;
+		   		break;
 		   }
 	   }
 	   if (category==2){
@@ -247,7 +307,7 @@ public class Outside_Interactions {
 	   if (category == -1){
 			switch (currentState){
 		   	case 1:
-		   		timeDelay = 5000;
+		   		timeDelay = 6000;
 		   		break;
 		   	case 24:
 		   		timeDelay = 5000;
@@ -260,7 +320,7 @@ public class Outside_Interactions {
 		   		timeDelay = 5000;
 		   		break;
 		   	case 21:
-		   		timeDelay = 1000;//12000;
+		   		timeDelay = 12000;
 		   		break;
 		   	case 22:
 		   		timeDelay = 12000;
@@ -302,7 +362,15 @@ public class Outside_Interactions {
 	   }
 	   else if (category==1){
 		   switch (currentState){
-		   
+		   case 3:
+		   case 4:
+		   case 5:
+		   case 6:
+			   timeDelay = 3000;
+			   break;
+		   case 7:
+			   timeDelay = 5000;
+			   break;
 		   }
 	   }
 	   else if (category==2){
@@ -313,4 +381,7 @@ public class Outside_Interactions {
 	   timeDelay += 500;
    }
 	
+	public void setVisitorName(String s) {
+		this.visitorName = s;
+	}
 }
