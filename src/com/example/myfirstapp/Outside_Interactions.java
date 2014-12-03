@@ -56,10 +56,10 @@ public class Outside_Interactions {
 		   Random rand = new Random();
 		   factNum = rand.nextInt(funFacts.length);
 		   questions.put("confirmIdentity", "are you " + visitorName + "?");
-		   questions.put("urgent", "Hey " + visitorName.split(" ")[0] + " are you in a hurry?");
-		   questions.put("purpose", "So what are you here for?");
-		   questions.put("byeGood", "Ok I just notified " + residentName + ". Great seeing you again! Have a nice day.");
-		   questions.put("byeBad", "I got the message, now get out you unsocialble twit");
+		   questions.put("urgent", "Hey " + visitorName.split(" ")[0] + ", are you in a hurry?");
+		   questions.put("purpose", "So " + visitorName.split(" ")[0] + ", what are you here for?");
+		   questions.put("byeGood", "Ok I just notified " + residentName + ". Great seeing you again!");
+		   questions.put("byeBad", "I sent the message, now get the hell out you unsocialble twit.");
 		   questions.put("funFact", funFacts[factNum]);
 
 	   }
@@ -320,7 +320,7 @@ public class Outside_Interactions {
 		   		timeDelay = 5000;
 		   		break;
 		   	case 21:
-		   		timeDelay = 12000;
+		   		timeDelay = 8000;
 		   		break;
 		   	case 22:
 		   		timeDelay = 12000;
@@ -363,9 +363,12 @@ public class Outside_Interactions {
 	   else if (category==1){
 		   switch (currentState){
 		   case 3:
+			   timeDelay = 1500;
+			   break;
 		   case 4:
+			   timeDelay = 2000;
+			   break;
 		   case 5:
-		   case 6:
 			   timeDelay = 3000;
 			   break;
 		   case 7:
